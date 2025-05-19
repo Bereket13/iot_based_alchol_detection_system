@@ -52,7 +52,6 @@
       background-color: #f0f0f0;
     }
 
-    /* Modal Styling */
     .modal {
       display: none;
       position: fixed;
@@ -175,8 +174,9 @@
           const carData = carSnap.val();
           const gpsData = gpsSnap.val();
 
-          document.getElementById("accident").textContent = carData.ACCIDENT;
-          document.getElementById("alcohol").textContent = carData.ALCOHOL;
+          document.getElementById("accident").textContent = carData.ACCIDENT === 1 ? "Yes" : "No";
+          document.getElementById("alcohol").textContent = carData.ALCOHOL === 0 ? "Yes" : "No";
+
           document.getElementById("latitude").textContent = gpsData.latitude.toFixed(6);
           document.getElementById("longitude").textContent = gpsData.longitude.toFixed(6);
           document.getElementById("speed").textContent = gpsData.speed.toFixed(2);
@@ -210,8 +210,8 @@
 
       row.innerHTML = `
         <td>${new Date().toLocaleTimeString()}</td>
-        <td>${carData.ACCIDENT}</td>
-        <td>${carData.ALCOHOL}</td>
+        <td>${carData.ACCIDENT === 1 ? "Yes" : "No"}</td>
+        <td>${carData.ALCOHOL === 0 ? "Yes" : "No"}</td>
         <td>${gpsData.latitude.toFixed(6)}</td>
         <td>${gpsData.longitude.toFixed(6)}</td>
         <td>${gpsData.speed.toFixed(2)}</td>
