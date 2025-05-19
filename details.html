@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IoT Vehicle Dashboard</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f7f9fc;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .status {
+      margin: 20px auto;
+      max-width: 600px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .status p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .status-ok {
+      color: green;
+      font-weight: bold;
+    }
+    .status-alert {
+      color: red;
+      font-weight: bold;
+    }
+    table {
+      width: 100%;
+      margin-top: 30px;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+
+    /* Modal Styling */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      padding-top: 100px;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: auto;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      text-align: center;
+      border-top: 5px solid #d9534f;
+    }
+    .modal-content h2 {
+      color: #d9534f;
+    }
+    .modal-content p {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+<body>
+  <h1>IoT Vehicle Dashboard</h1>
+
+  <div class="status">
+    <p>🚨 Accident: <span id="accident">Loading...</span></p>
+    <p>🍺 Alcohol Detected: <span id="alcohol">Loading...</span></p>
+    <p>🛰️ Latitude: <span id="latitude">Loading...</span></p>
+    <p>🛰️ Longitude: <span id="longitude">Loading...</span></p>
+    <p>🚗 Speed: <span id="speed">Loading...</span> km/h</p>
+    <p>⏰ Time: <span id="time">Loading...</span></p>
+  </div>
+
+  <h2>📊 Data History (Last 20 Readings)</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Received At</th>
+        <th>Accident</th>
+        <th>Alcohol</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Speed</th>
+        <th>Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+
+  <!-- Alcohol Detection Modal -->
+  <div id="alcoholModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('alcoholModal').style.display='none'">&times;</span>
+      <h2>⚠️ Alcohol Detected!</h2>
+      <p><strong>Driver:</strong> Anbes Teshale</p>
+      <p><strong>Car Model:</strong> Toyota Corolla</p>
+      <p><strong>Plate Number:</strong> C2234</p>
+      <p>Vehicle ignition is disabled due to alcohol detection.</p>
+    </div>
+  </div>
+
+  <!-- Accident Detection Modal -->
+  <div id="accidentModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="document.getElementById('accidentModal').style.display='none'">&times;</span>
+      <h2>⚠️ Accident Detected!</h2>
+      <p><strong>Driver:</strong> Anbes Teshale</p>
+      <p><strong>Car Model:</strong> Toyota Corolla</p>
+      <p><strong>Plate Number:</strong> C2234</p>
+      <p>Accident Has Happened at:</p>
+      <p>🛰️ Latitude: <span id="accident-lat">Loading...</span></p>
+      <p>🛰️ Longitude: <span id="accident-lon">Loading...</span></p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQ9pRGkwr6HnfNhmUo5mQWF5pFu8dWOIU",
+      authDomain: "road-safety-with-iot.firebaseapp.com",
+      databaseURL: "https://road-safety-with-iot-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "road-safety-with-iot",
+      storageBucket: "road-safety-with-iot.appspot.com",
+      messagingSenderId: "933210627734",
+      appId: "1:933210627734:web:2e60a902520895ce926cb7"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function updateData() {
+      const carRef = ref(db, "CAR");
+      const gpsRef = ref(db, "GPS");
+
+      try {
+        const carSnap = await get(carRef);
+        const gpsSnap = await get(gpsRef);
+
+        if (carSnap.exists() && gpsSnap.exists()) {
+          const carData = carSnap.val();
+          const gpsData = gpsSnap.val();
+
+          document.getElementById("accident").textContent = carData.ACCIDENT;
+          document.getElementById("alcohol").textContent = carData.ALCOHOL;
+          document.getElementById("latitude").textContent = gpsData.latitude.toFixed(6);
+          document.getElementById("longitude").textContent = gpsData.longitude.toFixed(6);
+          document.getElementById("speed").textContent = gpsData.speed.toFixed(2);
+          document.getElementById("time").textContent = gpsData.time;
+
+          document.getElementById("accident").className = carData.ACCIDENT === 1 ? "status-alert" : "status-ok";
+          document.getElementById("alcohol").className = carData.ALCOHOL === 0 ? "status-alert" : "status-ok";
+
+          if (carData.ALCOHOL === 0) {
+            document.getElementById("alcoholModal").style.display = "block";
+          }
+
+          if (carData.ACCIDENT === 1) {
+            document.getElementById("accident-lat").textContent = gpsData.latitude.toFixed(6);
+            document.getElementById("accident-lon").textContent = gpsData.longitude.toFixed(6);
+            document.getElementById("accidentModal").style.display = "block";
+          }
+
+          logDataToTable(carData, gpsData);
+        } else {
+          console.log("No data found.");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    function logDataToTable(carData, gpsData) {
+      const tableBody = document.getElementById("historyBody");
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${new Date().toLocaleTimeString()}</td>
+        <td>${carData.ACCIDENT}</td>
+        <td>${carData.ALCOHOL}</td>
+        <td>${gpsData.latitude.toFixed(6)}</td>
+        <td>${gpsData.longitude.toFixed(6)}</td>
+        <td>${gpsData.speed.toFixed(2)}</td>
+        <td>${gpsData.time}</td>
+      `;
+
+      tableBody.prepend(row);
+      if (tableBody.rows.length > 20) {
+        tableBody.deleteRow(-1);
+      }
+    }
+
+    updateData();
+    setInterval(updateData, 5000);
+  </script>
+</body>
+</html>

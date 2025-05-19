@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>List of  Cars</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f7fa;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    #car-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+
+    .card-content {
+      padding: 15px;
+    }
+
+    .card-content .title {
+      font-weight: 600;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      color: #1a1a1a;
+    }
+
+    .card-content .detail {
+      color: #555;
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Available Cars</h2>
+  <div id="car-list"></div>
+
+  <script>
+    const cars = [
+      {
+        name: "Zerihun Mamo",
+        model: "Toyota Corolla",
+        plate: "C21441",
+        image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2Ff845b397-16d2-429f-b77c-79eaff08b29d%2F9a12a9af-11bd-417a-adc4-a92155932a20%2FIMG_20250512_210011_761_fc9fb6ad1e.jpg&w=640&q=75"
+      },
+      {
+        name: "Anbes Teshale",
+        model: "Vitz",
+        plate: "B87878",
+        image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2F17ae7dd6-5348-4015-bd6e-0402f737d904%2Fa53b1628-14e6-4671-8928-5afd3bc00031%2FIMG_20241118_174227_347_5c01f348aa.jpg&w=640&q=75"
+      },
+      {
+        name: "Michael Abate",
+        model: "Dzire Model 3",
+        plate: "C2131",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
+      }
+    ];
+
+    const listDiv = document.getElementById("car-list");
+
+    cars.forEach((car) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
+        <div class="card-content">
+          <div class="title">Driver: ${car.name}</div>
+          <div class="detail">Car Model: ${car.model}</div>
+          <div class="detail">Plate: ${car.plate}</div>
+        </div>
+      `;
+      card.onclick = () => {
+        window.location.href = "details.html";
+      };
+      listDiv.appendChild(card);
+    });
+  </script>
+</body>
+</html>
