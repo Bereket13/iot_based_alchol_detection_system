@@ -52,6 +52,7 @@
       background-color: #f0f0f0;
     }
 
+    /* Modal Styling */
     .modal {
       display: none;
       position: fixed;
@@ -113,7 +114,7 @@
         <th>Latitude</th>
         <th>Longitude</th>
         <th>Speed</th>
-        <th>Timestamp</th>
+       
       </tr>
     </thead>
     <tbody id="historyBody"></tbody>
@@ -124,7 +125,7 @@
     <div class="modal-content">
       <span class="close" onclick="document.getElementById('alcoholModal').style.display='none'">&times;</span>
       <h2>⚠️ Alcohol Detected!</h2>
-      <p><strong>Driver:</strong> Anbes Teshale</p>
+      <p><strong>Driver:</strong>Abel bekana</p>
       <p><strong>Car Model:</strong> Toyota Corolla</p>
       <p><strong>Plate Number:</strong> C2234</p>
       <p>Vehicle ignition is disabled due to alcohol detection.</p>
@@ -136,7 +137,7 @@
     <div class="modal-content">
       <span class="close" onclick="document.getElementById('accidentModal').style.display='none'">&times;</span>
       <h2>⚠️ Accident Detected!</h2>
-      <p><strong>Driver:</strong> Anbes Teshale</p>
+      <p><strong>Driver:</strong> Abel bekana</p>
       <p><strong>Car Model:</strong> Toyota Corolla</p>
       <p><strong>Plate Number:</strong> C2234</p>
       <p>Accident Has Happened at:</p>
@@ -174,9 +175,8 @@
           const carData = carSnap.val();
           const gpsData = gpsSnap.val();
 
-          document.getElementById("accident").textContent = carData.ACCIDENT === 1 ? "Yes" : "No";
-          document.getElementById("alcohol").textContent = carData.ALCOHOL === 0 ? "Yes" : "No";
-
+          document.getElementById("accident").textContent = carData.ACCIDENT;
+          document.getElementById("alcohol").textContent = carData.ALCOHOL;
           document.getElementById("latitude").textContent = gpsData.latitude.toFixed(6);
           document.getElementById("longitude").textContent = gpsData.longitude.toFixed(6);
           document.getElementById("speed").textContent = gpsData.speed.toFixed(2);
@@ -205,27 +205,28 @@
     }
 
     function logDataToTable(carData, gpsData) {
-      const tableBody = document.getElementById("historyBody");
-      const row = document.createElement("tr");
+  const tableBody = document.getElementById("historyBody");
+  const row = document.createElement("tr");
 
-      row.innerHTML = `
-        <td>${new Date().toLocaleTimeString()}</td>
-        <td>${carData.ACCIDENT === 1 ? "Yes" : "No"}</td>
-        <td>${carData.ALCOHOL === 0 ? "Yes" : "No"}</td>
-        <td>${gpsData.latitude.toFixed(6)}</td>
-        <td>${gpsData.longitude.toFixed(6)}</td>
-        <td>${gpsData.speed.toFixed(2)}</td>
-        <td>${gpsData.time}</td>
-      `;
+  row.innerHTML = `
+    <td>${new Date().toLocaleTimeString()}</td>
+    <td>${carData.ACCIDENT}</td>
+    <td>${carData.ALCOHOL}</td>
+    <td>${gpsData.latitude.toFixed(6)}</td>
+    <td>${gpsData.longitude.toFixed(6)}</td>
+    <td>${gpsData.speed.toFixed(2)}</td>
+  `;
 
-      tableBody.prepend(row);
-      if (tableBody.rows.length > 20) {
-        tableBody.deleteRow(-1);
-      }
-    }
+  tableBody.prepend(row);
+  if (tableBody.rows.length > 20) {
+    tableBody.deleteRow(-1);
+  }
+}
+    
 
     updateData();
     setInterval(updateData, 5000);
   </script>
 </body>
 </html>
+
