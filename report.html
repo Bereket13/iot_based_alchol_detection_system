@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reports</title>
+  <style>
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      background: #f5f7fa;
+    }
+    
+    .report-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #e74c3c;
+      margin: 10px 0;
+    }
+    
+    .stat-label {
+      color: #7f8c8d;
+      font-size: 1rem;
+    }
+    
+    .history-chart {
+      margin-top: 40px;
+      height: 300px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #95a5a6;
+    }
+  
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px; 
+    height: 100vh;
+    background: white; 
+    color: #2c3e50; 
+    padding: 20px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    transform: translateX(0); 
+  }
+
+  .sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #eee; 
+    margin-bottom: 20px;
+  }
+
+  .sidebar-header h3 {
+    color: #3498db;
+    font-weight: 500;
+    font-size: 1.3rem;
+  }
+
+  .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-item {
+    padding: 12px 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #34495e;
+  }
+
+  .nav-item:hover {
+    background: #f5f7fa; 
+  }
+
+  .nav-item.active {
+    background: #ebf5fb; 
+    color: #2980b9;
+    border-left: 3px solid #3498db;
+  }
+
+  .nav-item i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+  }
+
+ 
+  body {
+    overflow-x: hidden;
+  }
+
+
+</style>
+</head>
+<body>
+ 
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h3>Dashboard</h3>
+    </div>
+    <ul class="nav-menu">
+      <li class="nav-item" onclick="window.location.href='carlist.html'">
+        <i>🏠</i> Home
+      </li>
+      <li class="nav-item" onclick="window.location.href='adduser.html'">
+        <i>👤</i> Add User
+      </li>
+      <li class="nav-item active" onclick="window.location.href='report.html'">
+        <i>📊</i> Report
+      </li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <div class="report-container">
+      <h2>Incident Reports</h2>
+      
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value" id="accident-count">12</div>
+          <div class="stat-label">Total Accidents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="alcohol-count">8</div>
+          <div class="stat-label">Alcohol Detections</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="prevented-count">5</div>
+          <div class="stat-label">Accidents Prevented</div>
+        </div>
+      </div>
+      
+      <div class="history-chart">
+        [Incident History Chart Would Appear Here]
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //  fetch values from your database
+    // These are just placeholder values
+    document.getElementById('accident-count').textContent = '12';
+    document.getElementById('alcohol-count').textContent = '8';
+    document.getElementById('prevented-count').textContent = '5';
+  </script>
+</body>
+</html>
