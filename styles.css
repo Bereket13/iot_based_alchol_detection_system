@@ -28,3 +28,41 @@ h1 {
   margin: 6px 0;
   font-size: 14px;
 }
+
+#alert-banner {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: #ff4444;
+  color: white;
+  padding: 15px 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  text-align: center;
+  max-width: 80%;
+  animation: pulse 2s infinite;
+}
+
+#alert-content {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+#view-details-btn {
+  background-color: white;
+  color: #ff4444;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); }
+}
