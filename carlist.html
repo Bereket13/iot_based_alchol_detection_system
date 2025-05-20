@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>List of  Cars</title>
+  <title>List of Cars</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
@@ -67,14 +67,217 @@
       color: #555;
       margin-bottom: 5px;
     }
+
+    /* Alert Banner Styles */
+    #alert-banner {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background-color: #ff4444;
+      color: white;
+      padding: 15px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      text-align: center;
+      max-width: 80%;
+      animation: pulse 2s infinite;
+    }
+
+    #alert-content {
+      display: inline-block;
+      margin-right: 20px;
+    }
+
+    #view-details-btn {
+      background-color: white;
+      color: #ff4444;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @keyframes pulse {
+      0% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.05); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+   
+ .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 220px; 
+    height: 100vh;
+    background: white; 
+    color: #2c3e50; 
+    padding: 20px 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    transform: translateX(0); 
+  }
+
+  .sidebar-header {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid #eee; 
+    margin-bottom: 20px;
+  }
+
+  .sidebar-header h3 {
+    color: #3498db;
+    font-weight: 500;
+    font-size: 1.3rem;
+  }
+
+  .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-item {
+    padding: 12px 20px;
+    transition: all 0.3s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #34495e;
+  }
+
+  .nav-item:hover {
+    background: #f5f7fa; 
+  }
+
+  .nav-item.active {
+    background: #ebf5fb;
+    color: #2980b9;
+    border-left: 3px solid #3498db;
+  }
+
+  .nav-item i {
+    margin-right: 10px;
+    font-size: 1.1rem;
+  }
+
+
+  .main-content {
+    margin-left: 240px; 
+    padding: 20px 40px;
+    transition: all 0.3s;
+    max-width: calc(100% - 240px); 
+  }
+
+  
+  body {
+    overflow-x: hidden;
+  }
+  .search-container {
+    max-width: 600px;
+    margin: 0 auto 30px;
+    width: 100%;
+    transition: all 0.3s ease;
+  }
+
+  #search-input {
+    width: 100%;
+    padding: 12px 20px;
+    border: 2px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+
+  #search-input:focus, 
+  #search-input:hover {
+    border-color: #2D89EF;
+    box-shadow: 0 4px 8px rgba(45, 137, 239, 0.2);
+    transform: scale(1.02);
+  }
+
+  #search-input::placeholder {
+    color: #999;
+  }
+
+  
+  .search-container {
+    max-width: 800px; 
+    margin: 0 auto 30px;
+  }
   </style>
 </head>
 <body>
-  <h2>Available Cars</h2>
-  <div id="car-list"></div>
+  <div class="sidebar">
+  <div class="sidebar-header">
+    <h3>Dashboard</h3>
+  </div>
+  <ul class="nav-menu">
+    <li class="nav-item active" onclick="window.location.href='carlist.html'">
+      <i>🏠</i> Home
+    </li>
+    <li class="nav-item" onclick="window.location.href='adduser.html'">
+      <i>👤</i> Add User
+    </li>
+    <li class="nav-item" onclick="window.location.href='report.html'">
+      <i>📊</i> Report
+    </li>
+  </ul>
+</div>
 
-  <script>
-    const cars = [
+    <div class="main-content">
+    <h2>Available Cars</h2>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search cars by name, model or plate..." />
+    </div>
+    <div id="car-list"></div>
+    
+    <!-- Add reset button -->
+    <div style="text-align: center; margin: 20px 0;">
+      <button onclick="resetToDefaultCars()" 
+              style="padding: 10px 20px; 
+                     background: #e74c3c; 
+                     color: white; 
+                     border: none; 
+                     border-radius: 10px;
+                     cursor: pointer;">
+        add to Default Cars
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    // Firebase imports (keep your existing imports)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // Your Firebase config (keep your existing config)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQ9pRGkwr6HnfNhmUo5mQWF5pFu8dWOIU",
+      authDomain: "road-safety-with-iot.firebaseapp.com",
+      databaseURL: "https://road-safety-with-iot-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "road-safety-with-iot",
+      storageBucket: "road-safety-with-iot.firebasestorage.app",
+      messagingSenderId: "933210627734",
+      appId: "1:933210627734:web:2e60a902520895ce926cb7"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // DOM elements
+    const listDiv = document.getElementById("car-list");
+    const alertBanner = document.getElementById("alert-banner");
+    const alertContent = document.getElementById("alert-content");
+    const viewDetailsBtn = document.getElementById("view-details-btn");
+
+    // Default cars data
+    const defaultCars = [
       {
         name: "Zerihun Mamo",
         model: "Toyota Corolla",
@@ -82,37 +285,135 @@
         image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2Ff845b397-16d2-429f-b77c-79eaff08b29d%2F9a12a9af-11bd-417a-adc4-a92155932a20%2FIMG_20250512_210011_761_fc9fb6ad1e.jpg&w=640&q=75"
       },
       {
-        name: "berket Teshale",
+        name: "Abel Bekana",
         model: "Vitz",
         plate: "B87878",
         image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2F17ae7dd6-5348-4015-bd6e-0402f737d904%2Fa53b1628-14e6-4671-8928-5afd3bc00031%2FIMG_20241118_174227_347_5c01f348aa.jpg&w=640&q=75"
       },
       {
-        name: "Michael Abate",
+        name: "beka Abate",
         model: "Dzire Model 3",
         plate: "C2131",
         image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
       }
+      ,{
+        name: "Daniel Assefa",
+        model: "Hyundai Tucson",
+        plate: "A5678",
+        image: "https://via.placeholder.com/400x300?text=Hyundai+Tucson"
+      },
+      {
+        name: "Elias Kebede",
+        model: "Honda Civic",
+        plate: "D9876",
+        image: "https://via.placeholder.com/400x300?text=Honda+Civic"
+      },
+      {
+        name: "Fitsum Teshome",
+        model: "Mazda CX-5",
+        plate: "E3456",
+        image: "https://via.placeholder.com/400x300?text=Mazda+CX-5"
+      },
+      {
+        name: "Girma Wolde",
+        model: "Kia Sportage",
+        plate: "F7890",
+        image: "https://ncrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
+      },
+      {
+        name: "Hana Solomon",
+        model: "Nissan X-Trail",
+        plate: "G2345",
+        image: "https://via.placeholder.com/400x300?text=Nissan+X-Trail"
+      },
+      {
+        name: "Ibrahim Mohammed",
+        model: "Subaru Forester",
+        plate: "H6789",
+        image: "https://"
+      }
     ];
 
-    const listDiv = document.getElementById("car-list");
+    // Load and render cars
+    function loadAndRenderCars() {
+      // Get cars from localStorage or use defaults
+      const storedCars = JSON.parse(localStorage.getItem('cars'));
+      const cars = storedCars || defaultCars;
+      
+   
+      
+      // Render each car
+      cars.forEach((car) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
+          <div class="card-content">
+            <div class="title">Driver: ${car.name}</div>
+            <div class="detail">Car Model: ${car.model}</div>
+            <div class="detail">Plate: ${car.plate}</div>
+          </div>
+        `;
+        card.onclick = () => {
+          window.location.href = "details.html";
+        };
+        listDiv.appendChild(card);
+      });
+    }
 
-    cars.forEach((car) => {
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = `
-        <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
-        <div class="card-content">
-          <div class="title">Driver: ${car.name}</div>
-          <div class="detail">Car Model: ${car.model}</div>
-          <div class="detail">Plate: ${car.plate}</div>
-        </div>
-      `;
-      card.onclick = () => {
-        window.location.href = "details.html";
-      };
-      listDiv.appendChild(card);
+    // Reset to default cars
+    window.resetToDefaultCars = function() {
+      if (confirm('Are you sure you want to reset to default cars? This will remove all added cars.')) {
+        localStorage.removeItem('cars');
+        loadAndRenderCars(); // Re-render immediately
+      }
+    };
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      loadAndRenderCars();
+      
+      // Your existing Firebase alert monitoring code
+      const carRef = ref(db, "CAR");
+      onValue(carRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data) return;
+
+        if (data.ACCIDENT === 1) {
+          showAlert("⚠️ Accident Detected! Click to view details.");
+        } else if (data.ALCOHOL === 0) {
+          showAlert("⚠️ Alcohol Detected! Click to view details.");
+        } else {
+          hideAlert();
+        }
+      });
     });
+
+    function showAlert(message) {
+      alertContent.textContent = message;
+      alertBanner.style.display = "block";
+    }
+
+    function hideAlert() {
+      alertBanner.style.display = "none";
+    }
+
+    viewDetailsBtn.addEventListener("click", () => {
+      window.location.href = "details.html";
+    });
+
+    // Search functionality
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll('.card');
+      
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(searchTerm) ? 'flex' : 'none';
+      });
+    });
+
   </script>
+  
 </body>
 </html>
