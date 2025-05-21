@@ -4,68 +4,109 @@
   <meta charset="UTF-8">
   <title>List of Cars</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       background-color: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
     }
 
     h2 {
       text-align: center;
       margin-bottom: 30px;
-      color: #333;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 2rem;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #3498db, #2ecc71);
+      border-radius: 2px;
     }
 
     #car-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      max-width: 1300px;
       margin: 0 auto;
+      padding: 0 20px;
     }
 
     .card {
       background: #ffffff;
-      border-radius: 10px;
+      border-radius: 12px;
       overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       cursor: pointer;
       display: flex;
       flex-direction: column;
+      border: 1px solid rgba(0,0,0,0.05);
     }
 
     .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+      transform: translateY(-8px);
+      box-shadow: 0 12px 20px rgba(0,0,0,0.15);
     }
 
     .card img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover img {
+      transform: scale(1.03);
     }
 
     .card-content {
-      padding: 15px;
+      padding: 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
     }
 
     .card-content .title {
       font-weight: 600;
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      color: #1a1a1a;
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      color: #2c3e50;
     }
 
     .card-content .detail {
-      color: #555;
-      margin-bottom: 5px;
+      color: #7f8c8d;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .card-content .detail i {
+      margin-right: 8px;
+      color: #3498db;
+      width: 18px;
+      text-align: center;
     }
 
     /* Alert Banner Styles */
@@ -76,19 +117,22 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
-      background-color: #ff4444;
+      background: linear-gradient(135deg, #ff4444, #cc0000);
       color: white;
       padding: 15px 30px;
       border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 20px rgba(255, 68, 68, 0.3);
       text-align: center;
       max-width: 80%;
       animation: pulse 2s infinite;
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255,255,255,0.2);
     }
 
     #alert-content {
       display: inline-block;
       margin-right: 20px;
+      font-weight: 500;
     }
 
     #view-details-btn {
@@ -96,9 +140,16 @@
       color: #ff4444;
       border: none;
       padding: 8px 16px;
-      border-radius: 4px;
+      border-radius: 20px;
       font-weight: bold;
       cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #view-details-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
 
     @keyframes pulse {
@@ -107,124 +158,210 @@
       100% { transform: translateX(-50%) scale(1); }
     }
    
- .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 220px; 
-    height: 100vh;
-    background: white; 
-    color: #2c3e50; 
-    padding: 20px 0;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-    transform: translateX(0); 
-  }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: white;
+      color: #2c3e50;
+      padding: 25px 0;
+      box-shadow: 3px 0 15px rgba(0,0,0,0.08);
+      z-index: 100;
+      transform: translateX(0);
+      transition: all 0.3s ease;
+    }
 
-  .sidebar-header {
-    padding: 0 20px 20px;
-    border-bottom: 1px solid #eee; 
-    margin-bottom: 20px;
-  }
+    .sidebar-header {
+      padding: 0 25px 25px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+    }
 
-  .sidebar-header h3 {
-    color: #3498db;
-    font-weight: 500;
-    font-size: 1.3rem;
-  }
+    .sidebar-header h3 {
+      color: #3498db;
+      font-weight: 600;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+    }
 
-  .nav-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+    .sidebar-header h3 i {
+      margin-right: 10px;
+    }
 
-  .nav-item {
-    padding: 12px 20px;
-    transition: all 0.3s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color: #34495e;
-  }
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
 
-  .nav-item:hover {
-    background: #f5f7fa; 
-  }
+    .nav-item {
+      padding: 14px 25px;
+      transition: all 0.3s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #34495e;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+    }
 
-  .nav-item.active {
-    background: #ebf5fb;
-    color: #2980b9;
-    border-left: 3px solid #3498db;
-  }
+    .nav-item:hover {
+      background: #f8fafc;
+      color: #3498db;
+    }
 
-  .nav-item i {
-    margin-right: 10px;
-    font-size: 1.1rem;
-  }
+    .nav-item.active {
+      background: #f0f7ff;
+      color: #2980b9;
+      border-left: 3px solid #3498db;
+    }
 
+    .nav-item i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
 
-  .main-content {
-    margin-left: 240px; 
-    padding: 20px 40px;
-    transition: all 0.3s;
-    max-width: calc(100% - 240px); 
-  }
+    .main-content {
+      margin-left: 260px;
+      padding: 30px 40px;
+      transition: all 0.3s;
+      max-width: calc(100% - 260px);
+    }
 
-  
-  body {
-    overflow-x: hidden;
-  }
-  .search-container {
-    max-width: 600px;
-    margin: 0 auto 30px;
-    width: 100%;
-    transition: all 0.3s ease;
-  }
+    body {
+      overflow-x: hidden;
+    }
 
-  #search-input {
-    width: 100%;
-    padding: 12px 20px;
-    border: 2px solid #ddd;
-    border-radius: 25px;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
+    .search-container {
+      max-width: 700px;
+      margin: 0 auto 40px;
+      width: 100%;
+      transition: all 0.3s ease;
+      position: relative;
+    }
 
-  #search-input:focus, 
-  #search-input:hover {
-    border-color: #2D89EF;
-    box-shadow: 0 4px 8px rgba(45, 137, 239, 0.2);
-    transform: scale(1.02);
-  }
+    #search-input {
+      width: 100%;
+      padding: 14px 50px 14px 20px;
+      border: 2px solid #e0e6ed;
+      border-radius: 30px;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      background-color: #fff;
+    }
 
-  #search-input::placeholder {
-    color: #999;
-  }
+    #search-input:focus, 
+    #search-input:hover {
+      border-color: #3498db;
+      box-shadow: 0 6px 15px rgba(52, 152, 219, 0.2);
+    }
 
-  
-  .search-container {
-    max-width: 800px; 
-    margin: 0 auto 30px;
-  }
+    #search-input::placeholder {
+      color: #aaa;
+    }
+
+    .search-container i {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #7f8c8d;
+    }
+
+    .reset-btn {
+      padding: 12px 24px;
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin: 30px auto;
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(231, 76, 60, 0.4);
+    }
+
+    .reset-btn i {
+      margin-right: 8px;
+    }
+
+    .btn-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+        overflow: hidden;
+      }
+      
+      .sidebar-header h3 span,
+      .nav-item span {
+        display: none;
+      }
+      
+      .sidebar-header h3 i,
+      .nav-item i {
+        margin-right: 0;
+        font-size: 1.3rem;
+      }
+      
+      .main-content {
+        margin-left: 70px;
+        max-width: calc(100% - 70px);
+        padding: 20px;
+      }
+      
+      #car-list {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+    }
+
+    @media (max-width: 480px) {
+      #car-list {
+        grid-template-columns: 1fr;
+      }
+      
+      .search-container {
+        margin-bottom: 25px;
+      }
+    }
   </style>
 </head>
 <body>
+<div id="alert-banner" style="display: none;">
+  <div id="alert-content"></div>
+  <button id="view-details-btn">View Details</button>
+</div>
   <div class="sidebar">
   <div class="sidebar-header">
-    <h3>Dashboard</h3>
+    <h3><i class="fas fa-car-side"></i> <span>Dashboard</span></h3>
   </div>
   <ul class="nav-menu">
     <li class="nav-item active" onclick="window.location.href='carlist.html'">
-      <i>🏠</i> Home
+      <i class="fas fa-home"></i> <span>Home</span>
     </li>
     <li class="nav-item" onclick="window.location.href='adduser.html'">
-      <i>👤</i> Add User
+      <i class="fas fa-user-plus"></i> <span>Add User</span>
     </li>
     <li class="nav-item" onclick="window.location.href='report.html'">
-      <i>📊</i> Report
+      <i class="fas fa-chart-bar"></i> <span>Report</span>
     </li>
   </ul>
 </div>
@@ -233,19 +370,14 @@
     <h2>Available Cars</h2>
     <div class="search-container">
       <input type="text" id="search-input" placeholder="Search cars by name, model or plate..." />
+      <i class="fas fa-search"></i>
     </div>
     <div id="car-list"></div>
     
     <!-- Add reset button -->
-    <div style="text-align: center; margin: 20px 0;">
-      <button onclick="resetToDefaultCars()" 
-              style="padding: 10px 20px; 
-                     background: #e74c3c; 
-                     color: white; 
-                     border: none; 
-                     border-radius: 10px;
-                     cursor: pointer;">
-        add to Default Cars
+    <div class="btn-container">
+      <button class="reset-btn" onclick="resetToDefaultCars()">
+        <i class="fas fa-undo"></i> Remove from Default Cars
       </button>
     </div>
   </div>
@@ -295,8 +427,8 @@
         model: "Dzire Model 3",
         plate: "C2131",
         image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
-      }
-      ,{
+      },
+      {
         name: "Daniel Assefa",
         model: "Hyundai Tucson",
         plate: "A5678",
@@ -336,22 +468,30 @@
 
     // Load and render cars
     function loadAndRenderCars() {
-      // Get cars from localStorage or use defaults
-      const storedCars = JSON.parse(localStorage.getItem('cars'));
-      const cars = storedCars || defaultCars;
+      // Clear existing cars first
+      listDiv.innerHTML = '';
       
-   
+      // Get cars from localStorage
+      const storedCars = JSON.parse(localStorage.getItem('cars')) || [];
+      
+      // Combine with default cars, removing duplicates
+      const allCars = [...defaultCars, ...storedCars].reduce((unique, car) => {
+        if (!unique.some(c => c.plate === car.plate)) {
+          unique.push(car);
+        }
+        return unique;
+      }, []);
       
       // Render each car
-      cars.forEach((car) => {
+      allCars.forEach((car) => {
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
           <div class="card-content">
-            <div class="title">Driver: ${car.name}</div>
-            <div class="detail">Car Model: ${car.model}</div>
-            <div class="detail">Plate: ${car.plate}</div>
+            <div class="title">${car.name}</div>
+            <div class="detail"><i class="fas fa-car"></i> ${car.model}</div>
+            <div class="detail"><i class="fas fa-id-card"></i> ${car.plate}</div>
           </div>
         `;
         card.onclick = () => {
@@ -363,7 +503,7 @@
 
     // Reset to default cars
     window.resetToDefaultCars = function() {
-      if (confirm('Are you sure you want to reset to default cars? This will remove all added cars.')) {
+      if (confirm('Are you sure you want to remove from default cars? ')) {
         localStorage.removeItem('cars');
         loadAndRenderCars(); // Re-render immediately
       }
@@ -391,7 +531,9 @@
 
     function showAlert(message) {
       alertContent.textContent = message;
-      alertBanner.style.display = "block";
+      alertBanner.style.display = "flex";
+      alertBanner.style.alignItems = "center";
+      alertBanner.style.justifyContent = "center";
     }
 
     function hideAlert() {
