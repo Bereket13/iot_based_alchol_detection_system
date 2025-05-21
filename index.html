@@ -1,81 +1,238 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Driver Monitoring Login</title>
+  <title>Driver Safety System | Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --danger: #ef233c;
+      --success: #4cc9f0;
+      --border-radius: 12px;
+      --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: url('https://www.shutterstock.com/image-photo/drunk-driver-behind-wheel-man-600nw-1929357062.jpg') no-repeat center center fixed;
-      background-size: cover;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      color: var(--dark);
     }
+    
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
     .login-container {
-      background: rgb(255, 255, 255);
-      padding: 30px;
-      border-radius: 12px;
-      max-width: 350px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 2.5rem;
+      border-radius: var(--border-radius);
       width: 100%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      max-width: 420px;
+      box-shadow: var(--box-shadow);
       text-align: center;
+      transform: translateY(0);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
     }
+    
+    .login-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+    
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), var(--success));
+    }
+    
     .logo {
       width: 80px;
       height: 80px;
-      margin-bottom: 15px;
+      margin-bottom: 1.5rem;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
     }
+    
     h2 {
-      margin-bottom: 20px;
-      color: #333;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+      font-weight: 600;
+      position: relative;
+      display: inline-block;
     }
-    input {
+    
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 3px;
+      background: var(--success);
+      border-radius: 3px;
+    }
+    
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .input-group input {
       width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background-color: #f8f9fa;
     }
+    
+    .input-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background-color: white;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+    
+    .input-group i {
+      position: absolute;
+      left: 1rem;
+      top: 2.6rem;
+      color: var(--primary);
+    }
+    
     button {
       width: 100%;
-      padding: 12px;
-      background-color: #2D89EF;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       border: none;
-      font-size: 16px;
-      border-radius: 6px;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
-      margin-top: 10px;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+    
     button:hover {
-      background-color: #1c66c3;
+      background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
+    
     .error {
-      color: red;
-      margin-top: 10px;
-      font-size: 14px;
+      color: var(--danger);
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      text-align: center;
+      animation: shake 0.5s;
     }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+    
+    .flag {
+      font-size: 1.5rem;
+      margin-left: 0.5rem;
+      vertical-align: middle;
+    }
+    
+    .footer-text {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+    
+    .footer-text a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+    
     @media (max-width: 500px) {
       .login-container {
-        margin: 0 20px;
+        padding: 1.5rem;
+        margin: 0 1rem;
+      }
+      
+      h2 {
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
   <div class="login-container">
-    <img src="data:image/png;base64,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" alt="">
-    <h2>Alchol and Accident Detection System Admin Login 🇪🇹</h2>
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <img class="logo" src="https://cdn-icons-png.flaticon.com/512/3063/3063187.png" alt="Driver Safety Logo">
+    <h2>Driver Safety System <span class="flag">🇪🇹</span></h2>
+    
+    <div class="input-group">
+      <label for="username">Username</label>
+      <i class="fas fa-user"></i>
+      <input type="text" id="username" placeholder="Enter your username">
+    </div>
+    
+    <div class="input-group">
+      <label for="password">Password</label>
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" placeholder="Enter your password">
+    </div>
+    
+    <button onclick="login()">
+      <i class="fas fa-sign-in-alt"></i> Login
+    </button>
+    
     <div id="error" class="error"></div>
+    
+    <p class="footer-text">
+      For authorized personnel only. <br>
+      Contact <a href="#">support</a> if you need access.
+    </p>
   </div>
 
   <script>
@@ -87,13 +244,36 @@
     function login() {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
+      const errorElement = document.getElementById("error");
+
+      if (!user || !pass) {
+        errorElement.textContent = "Please enter both username and password.";
+        return;
+      }
 
       if (user === adminUser.username && pass === adminUser.password) {
-        window.location.href = "carlist.html";
+        // Add loading effect
+        const btn = document.querySelector("button");
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+        btn.disabled = true;
+        
+        // Simulate loading before redirect
+        setTimeout(() => {
+          window.location.href = "carlist.html";
+        }, 1500);
       } else {
-        document.getElementById("error").textContent = "Invalid username or password.";
+        errorElement.textContent = "Invalid credentials. Please try again.";
+        document.getElementById("password").value = "";
+        document.getElementById("password").focus();
       }
     }
+    
+    // Add enter key functionality
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        login();
+      }
+    });
   </script>
 </body>
 </html>
