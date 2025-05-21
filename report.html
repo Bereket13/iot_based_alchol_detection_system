@@ -4,145 +4,294 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reports</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    * {
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
-    
-    .report-container {
-      max-width: 800px;
-      margin: 30px auto;
-      padding: 30px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    
-    h2 {
+
+    /* Sidebar Styles */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #ffffff;
       color: #2c3e50;
-      margin-bottom: 30px;
+      padding: 25px 0;
+      box-shadow: 3px 0 15px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+      transform: translateX(0);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 0 25px 25px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-header h3 {
+      color: #3498db;
+      font-weight: 600;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-header h3 i {
+      margin-right: 10px;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .nav-item {
+      padding: 14px 25px;
+      transition: all 0.3s;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      color: #34495e;
+      font-weight: 500;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item:hover {
+      background: #f8fafc;
+      color: #3498db;
+    }
+
+    .nav-item.active {
+      background: #f0f7ff;
+      color: #2980b9;
+      border-left: 3px solid #3498db;
+    }
+
+    .nav-item i {
+      margin-right: 12px;
+      font-size: 1.1rem;
+      width: 20px;
       text-align: center;
     }
-    
+
+    /* Main Content Styles */
+    .main-content {
+      margin-left: 260px;
+      padding: 30px 40px;
+      max-width: calc(100% - 260px);
+      transition: all 0.3s;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    .report-container {
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+      max-width: 800px;
+      width: 100%;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .report-container:hover {
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 2rem;
+      position: relative;
+      padding-bottom: 15px;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #3498db, #2ecc71);
+      border-radius: 2px;
+    }
+
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
+      gap: 25px;
+      margin-bottom: 40px;
     }
-    
+
     .stat-card {
-      background: white;
+      background: #ffffff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
       text-align: center;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      border: 1px solid rgba(0, 0, 0, 0.05);
     }
-    
+
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
     .stat-value {
       font-size: 2.5rem;
-      font-weight: bold;
+      font-weight: 600;
       color: #e74c3c;
       margin: 10px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    
+
+    .stat-value i {
+      margin-right: 8px;
+      color: #3498db;
+      font-size: 1.5rem;
+    }
+
     .stat-label {
       color: #7f8c8d;
-      font-size: 1rem;
+      font-size: 0.95rem;
+      font-weight: 500;
     }
-    
+
     .history-chart {
       margin-top: 40px;
       height: 300px;
       background: #f9f9f9;
-      border-radius: 8px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #95a5a6;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     }
-  
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 220px; 
-    height: 100vh;
-    background: white; 
-    color: #2c3e50; 
-    padding: 20px 0;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-    z-index: 100;
-    transform: translateX(0); 
-  }
 
-  .sidebar-header {
-    padding: 0 20px 20px;
-    border-bottom: 1px solid #eee; 
-    margin-bottom: 20px;
-  }
+    .history-chart:hover {
+      box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
 
-  .sidebar-header h3 {
-    color: #3498db;
-    font-weight: 500;
-    font-size: 1.3rem;
-  }
+    /* Mobile Menu Toggle */
+    .menu-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      background: #3498db;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
 
-  .nav-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+    .menu-toggle:hover {
+      background: #2980b9;
+    }
 
-  .nav-item {
-    padding: 12px 20px;
-    transition: all 0.3s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color: #34495e;
-  }
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+        overflow: hidden;
+      }
 
-  .nav-item:hover {
-    background: #f5f7fa; 
-  }
+      .sidebar-header h3 span,
+      .nav-item span {
+        display: none;
+      }
 
-  .nav-item.active {
-    background: #ebf5fb; 
-    color: #2980b9;
-    border-left: 3px solid #3498db;
-  }
+      .sidebar-header h3 i,
+      .nav-item i {
+        margin-right: 0;
+        font-size: 1.3rem;
+      }
 
-  .nav-item i {
-    margin-right: 10px;
-    font-size: 1.1rem;
-  }
+      .sidebar.active {
+        width: 240px;
+      }
 
- 
-  body {
-    overflow-x: hidden;
-  }
+      .sidebar.active .sidebar-header h3 span,
+      .sidebar.active .nav-item span {
+        display: inline;
+      }
 
+      .main-content {
+        margin-left: 70px;
+        max-width: calc(100% - 70px);
+        padding: 20px;
+      }
 
-</style>
+      .menu-toggle {
+        display: block;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .report-container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+      }
+    }
+  </style>
 </head>
 <body>
- 
+
+  <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
   <div class="sidebar">
     <div class="sidebar-header">
-      <h3>Dashboard</h3>
+      <h3><i class="fas fa-car-side"></i> <span>Dashboard</span></h3>
     </div>
     <ul class="nav-menu">
       <li class="nav-item" onclick="window.location.href='carlist.html'">
-        <i>🏠</i> Home
+        <i class="fas fa-home"></i> <span>Home</span>
       </li>
       <li class="nav-item" onclick="window.location.href='adduser.html'">
-        <i>👤</i> Add User
+        <i class="fas fa-user-plus"></i> <span>Add User</span>
       </li>
       <li class="nav-item active" onclick="window.location.href='report.html'">
-        <i>📊</i> Report
+        <i class="fas fa-chart-bar"></i> <span>Report</span>
       </li>
     </ul>
   </div>
@@ -150,22 +299,16 @@
   <div class="main-content">
     <div class="report-container">
       <h2>Incident Reports</h2>
-      
       <div class="stats-container">
         <div class="stat-card">
-          <div class="stat-value" id="accident-count">12</div>
+          <div class="stat-value"><i class="fas fa-car-crash"></i><span id="accident-count">12</span></div>
           <div class="stat-label">Total Accidents</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value" id="alcohol-count">8</div>
+          <div class="stat-value"><i class="fas fa-wine-bottle"></i><span id="alcohol-count">8</span></div>
           <div class="stat-label">Alcohol Detections</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-value" id="prevented-count">5</div>
-          <div class="stat-label">Accidents Prevented</div>
-        </div>
       </div>
-      
       <div class="history-chart">
         [Incident History Chart Would Appear Here]
       </div>
@@ -173,11 +316,13 @@
   </div>
 
   <script>
-    //  fetch values from your database
-    // These are just placeholder values
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('active');
+    }
+
+    // Placeholder values for demonstration
     document.getElementById('accident-count').textContent = '12';
     document.getElementById('alcohol-count').textContent = '8';
-    document.getElementById('prevented-count').textContent = '5';
   </script>
 </body>
 </html>
