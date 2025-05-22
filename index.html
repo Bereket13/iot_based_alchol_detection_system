@@ -252,12 +252,12 @@
       }
 
       if (user === adminUser.username && pass === adminUser.password) {
-        // Add loading effect
+      
         const btn = document.querySelector("button");
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
         btn.disabled = true;
         
-        // Simulate loading before redirect
+       
         setTimeout(() => {
           window.location.href = "carlist.html";
         }, 1500);
@@ -268,7 +268,7 @@
       }
     }
     
-    // Add enter key functionality
+   
     document.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         login();
