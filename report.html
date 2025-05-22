@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reports</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -184,7 +186,7 @@
 
     .history-chart {
       margin-top: 40px;
-      height: 300px;
+      height: 350px;
       background: #f9f9f9;
       border-radius: 12px;
       display: flex;
@@ -193,10 +195,24 @@
       color: #95a5a6;
       box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      padding: 15px;
     }
 
     .history-chart:hover {
       box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Modern tooltip style */
+    .chart-tooltip {
+      position: absolute;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 100;
+      transition: all 0.3s ease;
     }
 
     /* Mobile Menu Toggle */
@@ -272,9 +288,14 @@
       .stat-value {
         font-size: 2rem;
       }
+      
+      .history-chart {
+        height: 280px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <button class="menu-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
@@ -301,28 +322,316 @@
       <h2>Incident Reports</h2>
       <div class="stats-container">
         <div class="stat-card">
-          <div class="stat-value"><i class="fas fa-car-crash"></i><span id="accident-count">12</span></div>
+          <div class="stat-value"><i class="fas fa-car-crash"></i><span id="accident-count">0</span></div>
           <div class="stat-label">Total Accidents</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value"><i class="fas fa-wine-bottle"></i><span id="alcohol-count">8</span></div>
+          <div class="stat-value"><i class="fas fa-wine-bottle"></i><span id="alcohol-count">0</span></div>
           <div class="stat-label">Alcohol Detections</div>
         </div>
       </div>
       <div class="history-chart">
-        [Incident History Chart Would Appear Here]
+        <canvas id="incidentChart"></canvas>
       </div>
     </div>
   </div>
 
-  <script>
-    function toggleSidebar() {
-      document.querySelector('.sidebar').classList.toggle('active');
+  <script type="module">
+    // Firebase imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCQ9pRGkwr6HnfNhmUo5mQWF5pFu8dWOIU",
+      authDomain: "road-safety-with-iot.firebaseapp.com",
+      databaseURL: "https://road-safety-with-iot-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "road-safety-with-iot",
+      storageBucket: "road-safety-with-iot.firebasestorage.app",
+      messagingSenderId: "933210627734",
+      appId: "1:933210627734:web:2e60a902520895ce926cb7"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Initialize counters from Firebase or local storage
+    let accidentCount = 0;
+    let alcoholCount = 0;
+    let incidentHistory = [];
+    let lastAccidentDetection = 0;
+    let lastAlcoholDetection = 0;
+
+    // Initialize Chart with modern styling
+    const ctx = document.getElementById('incidentChart').getContext('2d');
+    const incidentChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          {
+            label: 'Accidents',
+            data: [],
+            borderColor: '#e74c3c',
+            backgroundColor: 'rgba(231, 76, 60, 0.05)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#e74c3c',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6,
+            pointHoverBorderWidth: 2,
+            pointRadius: 4,
+            pointHitRadius: 10
+          },
+          {
+            label: 'Alcohol Detections',
+            data: [],
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.05)',
+            borderWidth: 2,
+            tension: 0.3,
+            fill: true,
+            pointBackgroundColor: '#3498db',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6,
+            pointHoverBorderWidth: 2,
+            pointRadius: 4,
+            pointHitRadius: 10
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Incident History (Last 10 Minutes)',
+            font: {
+              size: 16,
+              weight: '600',
+              family: 'Inter'
+            },
+            padding: {
+              bottom: 20
+            },
+            color: '#2c3e50'
+          },
+          legend: {
+            position: 'top',
+            labels: {
+              font: {
+                family: 'Inter',
+                size: 13
+              },
+              padding: 20,
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleFont: {
+              family: 'Inter',
+              size: 14,
+              weight: '600'
+            },
+            bodyFont: {
+              family: 'Inter',
+              size: 13
+            },
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            intersect: false,
+            mode: 'index',
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                label += context.parsed.y;
+                return label;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false,
+              drawBorder: false
+            },
+            ticks: {
+              font: {
+                family: 'Inter',
+                size: 11
+              },
+              maxRotation: 45,
+              minRotation: 45
+            }
+          },
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: 'rgba(0, 0, 0, 0.05)',
+              drawBorder: false
+            },
+            ticks: {
+              font: {
+                family: 'Inter',
+                size: 11
+              },
+              stepSize: 1,
+              precision: 0
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        animation: {
+          duration: 1000,
+          easing: 'easeOutQuart'
+        }
+      }
+    });
+
+    // Function to format time for chart labels
+    function formatTime(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
-    // Placeholder values for demonstration
-    document.getElementById('accident-count').textContent = '12';
-    document.getElementById('alcohol-count').textContent = '8';
+    // Function to update the chart with new data
+    function updateChart(timestamp, accident, alcohol) {
+      const currentTime = Date.now();
+      const timeLabel = formatTime(timestamp);
+      
+      // Add new data point if there was an incident
+      if (accident || alcohol) {
+        incidentHistory.push({ 
+          time: timestamp, 
+          label: timeLabel,
+          accident: accident ? 1 : 0, 
+          alcohol: alcohol ? 1 : 0 
+        });
+      }
+      
+      // Keep only last 10 minutes of data
+      const tenMinutesAgo = currentTime - (10 * 60 * 1000);
+      incidentHistory = incidentHistory.filter(item => item.time > tenMinutesAgo);
+      
+      // Group data by minute to prevent overcrowding
+      const groupedData = {};
+      incidentHistory.forEach(item => {
+        const minute = Math.floor(item.time / (60 * 1000)) * 60 * 1000;
+        if (!groupedData[minute]) {
+          groupedData[minute] = {
+            time: minute,
+            label: formatTime(minute),
+            accident: 0,
+            alcohol: 0
+          };
+        }
+        groupedData[minute].accident += item.accident;
+        groupedData[minute].alcohol += item.alcohol;
+      });
+      
+      const sortedData = Object.values(groupedData).sort((a, b) => a.time - b.time);
+      
+      // Update chart data
+      incidentChart.data.labels = sortedData.map(item => item.label);
+      incidentChart.data.datasets[0].data = sortedData.map(item => item.accident);
+      incidentChart.data.datasets[1].data = sortedData.map(item => item.alcohol);
+      
+      incidentChart.update();
+    }
+
+    // Load persistent counters from Firebase
+    async function loadCounters() {
+      try {
+        const accidentSnapshot = await get(ref(db, 'counters/accidents'));
+        const alcoholSnapshot = await get(ref(db, 'counters/alcohol'));
+        
+        accidentCount = accidentSnapshot.exists() ? accidentSnapshot.val() : 0;
+        alcoholCount = alcoholSnapshot.exists() ? alcoholSnapshot.val() : 0;
+        
+        document.getElementById('accident-count').textContent = accidentCount;
+        document.getElementById('alcohol-count').textContent = alcoholCount;
+      } catch (error) {
+        console.error("Error loading counters:", error);
+      }
+    }
+
+    // Update counters in Firebase
+    async function updateCounter(type, value) {
+      try {
+        await set(ref(db, `counters/${type}`), value);
+      } catch (error) {
+        console.error(`Error updating ${type} counter:`, error);
+      }
+    }
+
+    // Debounce function to prevent multiple rapid updates
+    function debounce(func, wait) {
+      let timeout;
+      return function(...args) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+      };
+    }
+
+    // Listen for real-time updates
+    const carRef = ref(db, "CAR");
+    onValue(carRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      const currentTime = Date.now();
+      const accidentDetected = data.ACCIDENT === 1;
+      const alcoholDetected = data.ALCOHOL === 0;
+
+      // Update accident count (with debounce to prevent multiple counts for same event)
+      if (accidentDetected && currentTime - lastAccidentDetection > 5000) {
+        lastAccidentDetection = currentTime;
+        accidentCount++;
+        document.getElementById('accident-count').textContent = accidentCount;
+        debounce(() => updateCounter('accidents', accidentCount), 1000)();
+      }
+
+      // Update alcohol count (with debounce to prevent multiple counts for same event)
+      if (alcoholDetected && currentTime - lastAlcoholDetection > 5000) {
+        lastAlcoholDetection = currentTime;
+        alcoholCount++;
+        document.getElementById('alcohol-count').textContent = alcoholCount;
+        debounce(() => updateCounter('alcohol', alcoholCount), 1000)();
+      }
+
+      // Update chart (only if there was an incident)
+      if (accidentDetected || alcoholDetected) {
+        updateChart(currentTime, accidentDetected, alcoholDetected);
+      }
+    });
+
+    // Initialize the dashboard
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCounters();
+      
+      // Initialize chart with empty data
+      updateChart(Date.now(), false, false);
+    });
+
+    // Sidebar toggle function
+    window.toggleSidebar = function () {
+      document.querySelector('.sidebar').classList.toggle('active');
+    };
   </script>
 </body>
+
 </html>
