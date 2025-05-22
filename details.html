@@ -110,8 +110,7 @@
 
   <h2>📊 Data History (Last Readings)</h2>
 
-  <!-- Modals placed before the table -->
-  <!-- Alcohol Detection Modal -->
+ 
   <div id="alcoholModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="document.getElementById('alcoholModal').style.display='none'">×</span>
@@ -123,7 +122,6 @@
     </div>
   </div>
 
-  <!-- Accident Detection Modal -->
   <div id="accidentModal" class="modal">
     <div class="modal-content">
       <span class="close" onclick="document.getElementById('accidentModal').style.display='none'">×</span>
@@ -181,7 +179,6 @@
         const carData = carSnap.val();
         const gpsData = gpsSnap.val();
 
-        // Update display with "Yes"/"No"
         document.getElementById("accident").textContent = carData.ACCIDENT === 1 ? "Yes" : "No";
         document.getElementById("alcohol").textContent = carData.ALCOHOL === 0 ? "Yes" : "No";
         document.getElementById("latitude").textContent = gpsData.latitude.toFixed(6);
