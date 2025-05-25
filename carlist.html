@@ -305,6 +305,77 @@
       margin: 30px 0;
     }
 
+    /* Header Styles */
+    .header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 15px 30px;
+      background-color: transparent;
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 99;
+    }
+
+    .notification-bell {
+      position: relative;
+      margin-right: 20px;
+      cursor: pointer;
+      color: #2c3e50;
+      font-size: 1.2rem;
+    }
+
+    .notification-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #e74c3c;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+    }
+
+ .sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 15px 0;
+  border-top: 1px solid #eee;
+}
+
+.sidebar-footer .logout-btn {
+  background: transparent;
+  color: #34495e;
+  border: none;
+  width: 100%;
+  padding: 14px 25px;
+  text-align: left;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s;
+}
+
+.sidebar-footer .logout-btn:hover {
+  background: #f8fafc;
+  color: #e74c3c;
+}
+
+.sidebar-footer .logout-btn i {
+  margin-right: 12px;
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
     @media (max-width: 768px) {
       .sidebar {
         width: 70px;
@@ -331,6 +402,11 @@
       #car-list {
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       }
+
+      .header {
+        padding: 15px;
+        
+      }
     }
 
     @media (max-width: 480px) {
@@ -341,6 +417,14 @@
       .search-container {
         margin-bottom: 25px;
       }
+
+      .logout-btn span {
+        display: none;
+      }
+
+      .logout-btn i {
+        margin-left: 0;
+      }
     }
   </style>
 </head>
@@ -349,7 +433,17 @@
   <div id="alert-content"></div>
   <button id="view-details-btn">View Details</button>
 </div>
-  <div class="sidebar">
+
+<!-- Header with notification and logout -->
+<div class="header">
+  <div class="notification-bell">
+    <i class="fas fa-bell"></i>
+    <div class="notification-count">2</div>
+  </div>
+ 
+</div>
+
+<div class="sidebar">
   <div class="sidebar-header">
     <h3><i class="fas fa-car-side"></i> <span>Dashboard</span></h3>
   </div>
@@ -364,198 +458,204 @@
       <i class="fas fa-chart-bar"></i> <span>Report</span>
     </li>
   </ul>
+  <div class="sidebar-footer">
+  <div class="nav-item logout-btn" onclick="window.location.href='index.html'">
+    <i class="fas fa-sign-out-alt"></i>
+    <span>Logout</span>
+  </div>
+</div>
 </div>
 
-    <div class="main-content">
-    <h2>Available Cars</h2>
-    <div class="search-container">
-      <input type="text" id="search-input" placeholder="Search cars by name, model or plate..." />
-      <i class="fas fa-search"></i>
-    </div>
-    <div id="car-list"></div>
-    
-
-    <div class="btn-container">
-      <button class="reset-btn" onclick="resetToDefaultCars()">
-        <i class="fas fa-undo"></i> Remove from Default Cars
-      </button>
-    </div>
+<div class="main-content">
+  <h2>Available Cars</h2>
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search cars by name, model or plate..." />
+    <i class="fas fa-search"></i>
   </div>
-
-  <script type="module">
-    // Firebase imports 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-    //  Firebase config 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCQ9pRGkwr6HnfNhmUo5mQWF5pFu8dWOIU",
-      authDomain: "road-safety-with-iot.firebaseapp.com",
-      databaseURL: "https://road-safety-with-iot-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "road-safety-with-iot",
-      storageBucket: "road-safety-with-iot.firebasestorage.app",
-      messagingSenderId: "933210627734",
-      appId: "1:933210627734:web:2e60a902520895ce926cb7"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
-   
-    const listDiv = document.getElementById("car-list");
-    const alertBanner = document.getElementById("alert-banner");
-    const alertContent = document.getElementById("alert-content");
-    const viewDetailsBtn = document.getElementById("view-details-btn");
-
-    const defaultCars = [
-      {
-        name: "Bereket Teklew",
-        model: "Toyota Corolla",
-        plate: "C21441",
-        image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2Ff845b397-16d2-429f-b77c-79eaff08b29d%2F9a12a9af-11bd-417a-adc4-a92155932a20%2FIMG_20250512_210011_761_fc9fb6ad1e.jpg&w=640&q=75"
-      },
-      {
-        name: "Abel Bekana",
-        model: "Vitz",
-        plate: "B87878",
-        image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2F17ae7dd6-5348-4015-bd6e-0402f737d904%2Fa53b1628-14e6-4671-8928-5afd3bc00031%2FIMG_20241118_174227_347_5c01f348aa.jpg&w=640&q=75"
-      },
-      {
-        name: "Natnael Belayneh",
-        model: "Dzire Model 3",
-        plate: "C2131",
-        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
-      },
-      {
-        name: "Tinsae Temesgen",
-        model: "Hyundai Tucson",
-        plate: "A5678",
-        image: "cars/tucson.jpg"
-      },
-      {
-        name: "Nigussie Negash",
-        model: "Honda Civic",
-        plate: "D9876",
-        image: "cars/civic.jpg"
-      },
-      {
-        name: "Fitsum Teshome",
-        model: "Mazda CX-5",
-        plate: "E3456",
-        image: "cars/mazda.jpg"
-      },
-      {
-        name: "Girma Wolde",
-        model: "Kia Sportage",
-        plate: "F7890",
-        image: "cars/kia.jpg"
-      },
-      {
-        name: "Hana Solomon",
-        model: "Nissan X-Trail",
-        plate: "G2345",
-        image: "cars/nissan.jpg"
-      },
-      {
-        name: "Ibrahim Mohammed",
-        model: "Subaru Forester",
-        plate: "H6789",
-        image: "cars/subaru.jpg"
-      }
-    ];
-
-    function loadAndRenderCars() {
-      listDiv.innerHTML = '';
-      
-      const storedCars = JSON.parse(localStorage.getItem('cars')) || [];
-      
-      const allCars = [...defaultCars, ...storedCars].reduce((unique, car) => {
-        if (!unique.some(c => c.plate === car.plate)) {
-          unique.push(car);
-        }
-        return unique;
-      }, []);
-      
-      allCars.forEach((car) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
-          <div class="card-content">
-            <div class="title">${car.name}</div>
-            <div class="detail"><i class="fas fa-car"></i> ${car.model}</div>
-            <div class="detail"><i class="fas fa-id-card"></i> ${car.plate}</div>
-          </div>
-        `;
-        card.onclick = () => {
-          window.location.href = "details.html";
-        };
-        listDiv.appendChild(card);
-      });
-    }
-
-    window.resetToDefaultCars = function() {
-      if (confirm('Are you sure you want to remove from default cars? ')) {
-        localStorage.removeItem('cars');
-        loadAndRenderCars(); 
-      }
-    };
-
+  <div id="car-list"></div>
   
-    document.addEventListener('DOMContentLoaded', () => {
-      loadAndRenderCars();
-      
-    
-      const carRef = ref(db, "CAR");
-      onValue(carRef, (snapshot) => {
-        const data = snapshot.val();
-        if (!data) return;
+  <div class="btn-container">
+    <button class="reset-btn" onclick="resetToDefaultCars()">
+      <i class="fas fa-undo"></i> Remove from Default Cars
+    </button>
+  </div>
+</div>
 
-        if (data.ACCIDENT === 1) {
-          showAlert("⚠️ Accident Detected! Click to view details.");
-        } else if (data.ALCOHOL === 0) {
-          showAlert("⚠️ Alcohol Detected! Click to view details.");
-        } else {
-          hideAlert();
-        }
-      });
-    });
+<script type="module">
+  // Firebase imports 
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-    function showAlert(message) {
-      alertContent.textContent = message;
-      alertBanner.style.display = "flex";
-      alertBanner.style.alignItems = "center";
-      alertBanner.style.justifyContent = "center";
+  //  Firebase config 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCQ9pRGkwr6HnfNhmUo5mQWF5pFu8dWOIU",
+    authDomain: "road-safety-with-iot.firebaseapp.com",
+    databaseURL: "https://road-safety-with-iot-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "road-safety-with-iot",
+    storageBucket: "road-safety-with-iot.firebasestorage.app",
+    messagingSenderId: "933210627734",
+    appId: "1:933210627734:web:2e60a902520895ce926cb7"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const listDiv = document.getElementById("car-list");
+  const alertBanner = document.getElementById("alert-banner");
+  const alertContent = document.getElementById("alert-content");
+  const viewDetailsBtn = document.getElementById("view-details-btn");
+
+  const defaultCars = [
+    {
+      name: "Bereket Teklew",
+      model: "Toyota Corolla",
+      plate: "C21441",
+      image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2Ff845b397-16d2-429f-b77c-79eaff08b29d%2F9a12a9af-11bd-417a-adc4-a92155932a20%2FIMG_20250512_210011_761_fc9fb6ad1e.jpg&w=640&q=75"
+    },
+    {
+      name: "Abel Bekana",
+      model: "Vitz",
+      plate: "B87878",
+      image: "https://www.mekina.net/_next/image?url=https%3A%2F%2Fmekina.s3.eu-west-1.amazonaws.com%2Fcars%2Fprivate%2F17ae7dd6-5348-4015-bd6e-0402f737d904%2Fa53b1628-14e6-4671-8928-5afd3bc00031%2FIMG_20241118_174227_347_5c01f348aa.jpg&w=640&q=75"
+    },
+    {
+      name: "Natnael Belayneh",
+      model: "Dzire Model 3",
+      plate: "C2131",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJmaLgUl2dZZiWAjczWmKvC9aK9wopnSTYEg&s"
+    },
+    {
+      name: "Tinsae Temesgen",
+      model: "Hyundai Tucson",
+      plate: "A5678",
+      image: "cars/tucson.jpg"
+    },
+    {
+      name: "Nigussie Negash",
+      model: "Honda Civic",
+      plate: "D9876",
+      image: "cars/civic.jpg"
+    },
+    {
+      name: "Fitsum Teshome",
+      model: "Mazda CX-5",
+      plate: "E3456",
+      image: "cars/mazda.jpg"
+    },
+    {
+      name: "Girma Wolde",
+      model: "Kia Sportage",
+      plate: "F7890",
+      image: "cars/kia.jpg"
+    },
+    {
+      name: "Hana Solomon",
+      model: "Nissan X-Trail",
+      plate: "G2345",
+      image: "cars/nissan.jpg"
+    },
+    {
+      name: "Ibrahim Mohammed",
+      model: "Subaru Forester",
+      plate: "H6789",
+      image: "cars/subaru.jpg"
     }
+  ];
 
-    function hideAlert() {
-      alertBanner.style.display = "none";
-    }
-
-    viewDetailsBtn.addEventListener("click", () => {
-      window.location.href = "details.html";
+  function loadAndRenderCars() {
+    listDiv.innerHTML = '';
+    
+    const storedCars = JSON.parse(localStorage.getItem('cars')) || [];
+    
+    const allCars = [...defaultCars, ...storedCars].reduce((unique, car) => {
+      if (!unique.some(c => c.plate === car.plate)) {
+        unique.push(car);
+      }
+      return unique;
+    }, []);
+    
+    allCars.forEach((car) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${car.image}" alt="${car.model}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=No+Image';">
+        <div class="card-content">
+          <div class="title">${car.name}</div>
+          <div class="detail"><i class="fas fa-car"></i> ${car.model}</div>
+          <div class="detail"><i class="fas fa-id-card"></i> ${car.plate}</div>
+        </div>
+      `;
+      card.onclick = () => {
+        window.location.href = "details.html";
+      };
+      listDiv.appendChild(card);
     });
+  }
 
-   document.getElementById('search-input').addEventListener('input', (e) => {
-  const searchTerm = e.target.value.toLowerCase();
-  const cards = document.querySelectorAll('.card');
-  
-  cards.forEach(card => {
-    const title = card.querySelector('.title').textContent.toLowerCase();
-    const details = card.querySelectorAll('.detail');
-    const model = details[0].textContent.toLowerCase();
-    const plate = details[1].textContent.toLowerCase();
+  window.resetToDefaultCars = function() {
+    if (confirm('Are you sure you want to remove from default cars? ')) {
+      localStorage.removeItem('cars');
+      loadAndRenderCars(); 
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAndRenderCars();
     
-    const matches = title.includes(searchTerm) || 
-                   model.includes(searchTerm) || 
-                   plate.includes(searchTerm);
-    
-    card.style.display = matches ? 'flex' : 'none';
+    const carRef = ref(db, "CAR");
+    onValue(carRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
+
+      if (data.ACCIDENT === 1) {
+        showAlert("⚠️ Accident Detected! Click to view details.");
+      } else if (data.ALCOHOL === 0) {
+        showAlert("⚠️ Alcohol Detected! Click to view details.");
+      } else {
+        hideAlert();
+      }
+    });
   });
-});
 
-  </script>
+  function showAlert(message) {
+    alertContent.textContent = message;
+    alertBanner.style.display = "flex";
+    alertBanner.style.alignItems = "center";
+    alertBanner.style.justifyContent = "center";
+  }
+
+  function hideAlert() {
+    alertBanner.style.display = "none";
+  }
+
+  viewDetailsBtn.addEventListener("click", () => {
+    window.location.href = "details.html";
+  });
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    const searchTerm = e.target.value.toLowerCase();
+    const cards = document.querySelectorAll('.card');
+    
+    cards.forEach(card => {
+      const title = card.querySelector('.title').textContent.toLowerCase();
+      const details = card.querySelectorAll('.detail');
+      const model = details[0].textContent.toLowerCase();
+      const plate = details[1].textContent.toLowerCase();
+      
+      const matches = title.includes(searchTerm) || 
+                     model.includes(searchTerm) || 
+                     plate.includes(searchTerm);
+      
+      card.style.display = matches ? 'flex' : 'none';
+    });
+  });
+
+  // Notification bell click handler
+  document.querySelector('.notification-bell').addEventListener('click', () => {
+    alert('You have 2 unread notifications');
+  });
+</script>
   
 </body>
 </html>
